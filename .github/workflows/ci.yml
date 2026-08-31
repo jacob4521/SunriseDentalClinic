@@ -1,6 +1,5 @@
 name: Java CI with Maven
 
-# The trigger of when this should run
 on:
   push:
     branches: [ "main" ]
@@ -9,29 +8,27 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # GitHub Runner
+    runs-on: ubuntu-latest
 
-    # 1. Creating the database
+    # 1. Creating the database (Using safe dummy password for CI)
     services:
       mysql:
         image: mysql:8.4
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: actions_test_pass
           MYSQL_DATABASE: sunrise_dental
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -p${{ secrets.DB_TEST_PASSWORD }}"
+          --health-cmd="mysqladmin ping -pactions_test_pass"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
 
     steps:
-      # 2. Getting the code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 3. Installing Java
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
@@ -39,8 +36,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # 4. Running the tests
       - name: Run Maven Tests
         env:
-          DB_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
+          DB_PASSWORD: actions_test_pass
         run: mvn test
