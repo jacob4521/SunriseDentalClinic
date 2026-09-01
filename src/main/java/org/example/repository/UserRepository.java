@@ -4,6 +4,7 @@ import org.example.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -41,6 +42,36 @@ public class UserRepository {
     }
 
     public User findByUsername(String username) {
+        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
+        String dbUser = "root";
+        String dbPass = System.getenv("DB_PASSWORD");
+        if (dbPass == null) dbPass = "";
+
+        if (username == null || username.isEmpty()) {
+            return null;
+        }
+
+        String sql = "SELECT username, password, role FROM users WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            0,
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("role")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 }
