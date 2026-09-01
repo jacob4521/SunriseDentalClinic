@@ -41,4 +41,8 @@ public class UserService {
         // Save the user and return result
         return userRepository.saveUser(user);
     }
+
+    public User authenticateUser(String username, String password) {
+        return null;
+    }
 }

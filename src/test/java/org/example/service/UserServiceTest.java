@@ -8,8 +8,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -60,5 +65,31 @@ public class UserServiceTest {
 
         // Ensure saveUser was never called
         verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void authenticateUser_returnsUserForValidCredentials() throws Exception {
+        // Arrange: plain-text password
+        String plain = "secret123";
+
+        // Hash the password using SHA-256 to simulate stored hash
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hashedBytes = md.digest(plain.getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashedBytes) {
+            sb.append(String.format("%02x", b));
+        }
+        String hashed = sb.toString();
+
+        // User stored in DB with hashed password
+        User stored = new User(1, "user1", hashed, "Staff");
+        when(userRepository.findByUsername("user1")).thenReturn(stored);
+
+        // Act: authenticate with plain-text password
+        User result = userService.authenticateUser("user1", plain);
+
+        // Assert: should return the user for valid credentials
+        assertNotNull(result);
+        assertEquals("user1", result.getUsername());
     }
 }
