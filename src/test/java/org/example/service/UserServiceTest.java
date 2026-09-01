@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
@@ -132,5 +133,19 @@ public class UserServiceTest {
         // Assert: should return true when requester is Admin
         // TDD: this test will fail until deleteUser in service is implemented
         assertTrue(result);
+    }
+
+    @Test
+    void deleteUser_returnsFalseWhenRequestedByStaff() {
+        // Arrange: staff requesting user
+        User staff = new User(2, "staffUser", "hashed", "Staff");
+        String targetUsername = "anyUser";
+
+        // Act
+        boolean result = userService.deleteUser(targetUsername, staff);
+
+        // Assert: should return false and repository.deleteUser shouldn't be called
+        assertFalse(result);
+        verify(userRepository, never()).deleteUser(anyString());
     }
 }
