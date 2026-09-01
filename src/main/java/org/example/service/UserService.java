@@ -78,4 +78,8 @@ public class UserService {
         }
         return false;
     }
+
+    public boolean updateUser(User updatedUser, User requestingUser) {
+        return false;
+    }
 }

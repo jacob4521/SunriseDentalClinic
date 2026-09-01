@@ -148,4 +148,22 @@ public class UserServiceTest {
         assertFalse(result);
         verify(userRepository, never()).deleteUser(anyString());
     }
+
+    @Test
+    void updateUser_returnsTrueWhenRequestedByAdmin() {
+        // Arrange: admin requesting user
+        User admin = new User(1, "adminUser", "hashed", "Admin");
+
+        // Updated user data with plain-text password
+        User updatedUser = new User(3, "someUser", "newPassword123", "Staff");
+
+        // Mock repository updateUser to return true
+        when(userRepository.updateUser(any(User.class))).thenReturn(true);
+
+        // Act
+        boolean result = userService.updateUser(updatedUser, admin);
+
+        // Assert: should be true when requester is Admin
+        assertTrue(result);
+    }
 }
