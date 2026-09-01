@@ -78,4 +78,26 @@ public class UserService {
         }
         return false;
     }
+
+    public boolean updateUser(User updatedUser, User requestingUser) {
+        if (requestingUser == null) return false;
+        if (!"Admin".equals(requestingUser.getRole())) return false;
+
+        if (updatedUser == null || updatedUser.getPassword() == null) return false;
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashed = md.digest(updatedUser.getPassword().getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hashed) {
+                hex.append(String.format("%02x", b));
+            }
+            updatedUser.setPassword(hex.toString());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        return userRepository.updateUser(updatedUser);
+    }
+
 }
