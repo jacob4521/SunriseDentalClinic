@@ -43,6 +43,30 @@ public class UserService {
     }
 
     public User authenticateUser(String username, String password) {
-        return null;
+        if (username == null || username.isEmpty() || password == null) {
+            return null;
+        }
+
+        User stored = userRepository.findByUsername(username);
+        if (stored == null || stored.getPassword() == null) {
+            return null;
+        }
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashed = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hashed) {
+                hex.append(String.format("%02x", b));
+            }
+            String hashedInput = hex.toString();
+
+            if (hashedInput.equals(stored.getPassword())) {
+                return stored;
+            }
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
