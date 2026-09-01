@@ -107,6 +107,27 @@ public class UserRepository {
     }
 
     public boolean deleteUser(String username) {
-        return false;
+        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
+        String dbUser = "root";
+        String dbPass = System.getenv("DB_PASSWORD");
+        if (dbPass == null) dbPass = "";
+
+        if (username == null || username.isEmpty()) {
+            return false;
+        }
+
+        String sql = "DELETE FROM users WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
