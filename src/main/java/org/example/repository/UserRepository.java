@@ -7,15 +7,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class UserRepository {
-    public boolean saveUser(User user) {
-        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
-        String dbUser = "root";
-        String dbPass = System.getenv("DB_PASSWORD"); // prefer environment config for secrets
-        if (dbPass == null) dbPass = "";
+    private String url;
+    private String dbUser;
+    private String dbPass;
 
-        // basic input validation to avoid SQL errors / NPEs
+    // Default constructor for production (MySQL)
+    public UserRepository() {
+        this.url = "jdbc:mysql://localhost:3306/sunrise_dental";
+        this.dbUser = "root";
+        this.dbPass = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "";
+    }
+
+    // Parameterized constructor for testing (H2)
+    public UserRepository(String url, String dbUser, String dbPass) {
+        this.url = url;
+        this.dbUser = dbUser;
+        this.dbPass = dbPass != null ? dbPass : "";
+    }
+
+    public boolean saveUser(User user) {
         if (user == null
                 || user.getUsername() == null || user.getUsername().isEmpty()
                 || user.getPassword() == null || user.getPassword().isEmpty()
@@ -35,18 +46,12 @@ public class UserRepository {
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            // log the exception to help debugging test failures
             e.printStackTrace();
             return false;
         }
     }
 
     public User findByUsername(String username) {
-        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
-        String dbUser = "root";
-        String dbPass = System.getenv("DB_PASSWORD");
-        if (dbPass == null) dbPass = "";
-
         if (username == null || username.isEmpty()) {
             return null;
         }
@@ -76,12 +81,6 @@ public class UserRepository {
     }
 
     public boolean updateUser(User user) {
-        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
-        String dbUser = "root";
-        String dbPass = System.getenv("DB_PASSWORD");
-        if (dbPass == null) dbPass = "";
-
-        // basic input validation to avoid SQL errors / NPEs
         if (user == null
                 || user.getUsername() == null || user.getUsername().isEmpty()
                 || user.getPassword() == null || user.getPassword().isEmpty()
@@ -107,11 +106,6 @@ public class UserRepository {
     }
 
     public boolean deleteUser(String username) {
-        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
-        String dbUser = "root";
-        String dbPass = System.getenv("DB_PASSWORD");
-        if (dbPass == null) dbPass = "";
-
         if (username == null || username.isEmpty()) {
             return false;
         }

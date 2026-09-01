@@ -1,59 +1,72 @@
 package org.example.repository;
 
 import org.example.User;
+import org.junit.jupiter.api.BeforeEach; // අලුතින් එකතු වූ import
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection; // අලුතින් එකතු වූ import
+import java.sql.DriverManager; // අලුතින් එකතු වූ import
+import java.sql.Statement; // අලුතින් එකතු වූ import
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserRepositoryTest {
 
+    // හැම Test එකක්ම ධාවනය වෙන්න කලින් මේක ස්වයංක්‍රීයව Run වෙනවා
+    @BeforeEach
+    void setUpDatabase() throws Exception {
+        String url = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL";
+        try (Connection conn = DriverManager.getConnection(url, "sa", "");
+             Statement stmt = conn.createStatement()) {
+
+            stmt.execute("DROP TABLE IF EXISTS users");
+            stmt.execute("CREATE TABLE users (" +
+                    "userId INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "username VARCHAR(50) NOT NULL, " +
+                    "password VARCHAR(255) NOT NULL, " +
+                    "role VARCHAR(20) NOT NULL)");
+        }
+    }
+
     @Test
     void saveUser_returnsTrueForValidUser() {
-        UserRepository repo = new UserRepository();
+        UserRepository repo = new UserRepository("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", "sa", "");
         String uniqueUsername = "bob_" + System.currentTimeMillis();
         User user = new User(1, uniqueUsername, "pass", "Staff");
 
-        // Expectation: repository should return true for a valid user
-        // This test follows TDD and should fail until saveUser is implemented.
         assertTrue(repo.saveUser(user));
     }
 
     @Test
     void findByUsername_returnsSavedUser() {
-        UserRepository repo = new UserRepository();
+        UserRepository repo = new UserRepository("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", "sa", "");
         String uniqueUsername = "alice_" + System.currentTimeMillis();
         User user = new User(1, uniqueUsername, "secret", "Staff");
 
-        // Attempt to save user first (may fail if DB not configured) - TDD expects findByUsername to be unimplemented and test to fail (red)
         repo.saveUser(user);
 
         User found = repo.findByUsername(uniqueUsername);
 
-        // Strict TDD: method currently returns null so this test should fail (red)
         assertNotNull(found);
         assertEquals(uniqueUsername, found.getUsername());
     }
 
     @Test
     void updateUser_updatesUserSuccessfully() {
-        UserRepository repo = new UserRepository();
+        UserRepository repo = new UserRepository("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", "sa", "");
         String uniqueUsername = "charlie_" + System.currentTimeMillis();
         User user = new User(1, uniqueUsername, "originalPassword", "Staff");
 
-        // Save user first
         repo.saveUser(user);
 
-        // Modify the user's password and role
         user.setPassword("updatedPassword");
         user.setRole("Admin");
 
-        // Call updateUser - should return true on successful update
-        // TDD: This test should fail (red) until updateUser is properly implemented
         assertTrue(repo.updateUser(user));
 
-        // Fetch the user again to verify the changes were persisted
         User updatedUser = repo.findByUsername(uniqueUsername);
 
         assertNotNull(updatedUser);
@@ -64,22 +77,16 @@ public class UserRepositoryTest {
 
     @Test
     void deleteUser_deletesUserSuccessfully() {
-        UserRepository repo = new UserRepository();
+        UserRepository repo = new UserRepository("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", "sa", "");
         String uniqueUsername = "diana_" + System.currentTimeMillis();
         User user = new User(1, uniqueUsername, "tempPassword", "Staff");
 
-        // Save user first
         repo.saveUser(user);
 
-        // Call deleteUser - should return true on successful delete
-        // TDD: This test should fail (red) until deleteUser is properly implemented
         assertTrue(repo.deleteUser(uniqueUsername));
 
-        // Verify the user is actually deleted by checking findByUsername returns null
         User deletedUser = repo.findByUsername(uniqueUsername);
 
-        // After deletion, findByUsername should return null
-        // This verifies the user was actually removed from the database
-        assertEquals(null, deletedUser);
+        assertNull(deletedUser);
     }
 }
