@@ -9,7 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -37,5 +41,24 @@ public class UserServiceTest {
         // Assert: Should return true on successful registration
         // TDD: This test should fail (red) until registerUser is properly implemented
         assertTrue(result);
+    }
+
+    @Test
+    void registerUser_returnsFalseIfUsernameExists() {
+        // Arrange: existing user in DB
+        User existing = new User(1, "admin1", "existingHashed", "Admin");
+        when(userRepository.findByUsername("admin1")).thenReturn(existing);
+
+        // New user attempting to register with same username
+        User newUser = new User(2, "admin1", "pass123", "Admin");
+
+        // Act
+        boolean result = userService.registerUser(newUser);
+
+        // Assert: should be false because username already exists
+        assertFalse(result);
+
+        // Ensure saveUser was never called
+        verify(userRepository, never()).saveUser(any(User.class));
     }
 }
