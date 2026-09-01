@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -91,5 +92,28 @@ public class UserServiceTest {
         // Assert: should return the user for valid credentials
         assertNotNull(result);
         assertEquals("user1", result.getUsername());
+    }
+
+    @Test
+    void authenticateUser_returnsNullForInvalidPassword() throws Exception {
+        // Arrange: Hash the correct password 'correct123'
+        String correct = "correct123";
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hashedBytes = md.digest(correct.getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashedBytes) {
+            sb.append(String.format("%02x", b));
+        }
+        String hashed = sb.toString();
+
+        // Stored user has the hashed correct password
+        User stored = new User(1, "user2", hashed, "Staff");
+        when(userRepository.findByUsername("user2")).thenReturn(stored);
+
+        // Act: attempt authentication with wrong password
+        User result = userService.authenticateUser("user2", "wrongPass");
+
+        // Assert: should be null for invalid password
+        assertNull(result);
     }
 }
