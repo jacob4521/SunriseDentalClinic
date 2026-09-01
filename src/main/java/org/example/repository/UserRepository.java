@@ -74,4 +74,8 @@ public class UserRepository {
 
         return null;
     }
+
+    public boolean updateUser(User user) {
+        return false;
+    }
 }

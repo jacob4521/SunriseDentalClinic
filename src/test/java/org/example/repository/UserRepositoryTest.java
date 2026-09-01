@@ -35,4 +35,30 @@ public class UserRepositoryTest {
         assertNotNull(found);
         assertEquals(uniqueUsername, found.getUsername());
     }
+
+    @Test
+    void updateUser_updatesUserSuccessfully() {
+        UserRepository repo = new UserRepository();
+        String uniqueUsername = "charlie_" + System.currentTimeMillis();
+        User user = new User(1, uniqueUsername, "originalPassword", "Staff");
+
+        // Save user first
+        repo.saveUser(user);
+
+        // Modify the user's password and role
+        user.setPassword("updatedPassword");
+        user.setRole("Admin");
+
+        // Call updateUser - should return true on successful update
+        // TDD: This test should fail (red) until updateUser is properly implemented
+        assertTrue(repo.updateUser(user));
+
+        // Fetch the user again to verify the changes were persisted
+        User updatedUser = repo.findByUsername(uniqueUsername);
+
+        assertNotNull(updatedUser);
+        assertEquals(uniqueUsername, updatedUser.getUsername());
+        assertEquals("updatedPassword", updatedUser.getPassword());
+        assertEquals("Admin", updatedUser.getRole());
+    }
 }
