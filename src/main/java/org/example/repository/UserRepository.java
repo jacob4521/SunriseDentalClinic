@@ -76,6 +76,33 @@ public class UserRepository {
     }
 
     public boolean updateUser(User user) {
-        return false;
+        String url = "jdbc:mysql://localhost:3306/sunrise_dental";
+        String dbUser = "root";
+        String dbPass = System.getenv("DB_PASSWORD");
+        if (dbPass == null) dbPass = "";
+
+        // basic input validation to avoid SQL errors / NPEs
+        if (user == null
+                || user.getUsername() == null || user.getUsername().isEmpty()
+                || user.getPassword() == null || user.getPassword().isEmpty()
+                || user.getRole() == null || user.getRole().isEmpty()) {
+            return false;
+        }
+
+        String sql = "UPDATE users SET password = ?, role = ? WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getPassword());
+            ps.setString(2, user.getRole());
+            ps.setString(3, user.getUsername());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
