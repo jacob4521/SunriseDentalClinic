@@ -39,4 +39,8 @@ public class UserRepository {
             return false;
         }
     }
+
+    public User findByUsername(String username) {
+        return null;
+    }
 }
