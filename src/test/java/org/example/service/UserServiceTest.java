@@ -116,4 +116,21 @@ public class UserServiceTest {
         // Assert: should be null for invalid password
         assertNull(result);
     }
+
+    @Test
+    void deleteUser_returnsTrueWhenRequestedByAdmin() {
+        // Arrange: admin requesting user
+        User admin = new User(1, "adminUser", "hashed", "Admin");
+        String targetUsername = "staffUser";
+
+        // Mock repository to return true for deletion
+        when(userRepository.deleteUser(targetUsername)).thenReturn(true);
+
+        // Act
+        boolean result = userService.deleteUser(targetUsername, admin);
+
+        // Assert: should return true when requester is Admin
+        // TDD: this test will fail until deleteUser in service is implemented
+        assertTrue(result);
+    }
 }

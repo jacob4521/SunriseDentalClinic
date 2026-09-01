@@ -69,4 +69,8 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean deleteUser(String targetUsername, User requestingUser) {
+        return false; // TDD Red phase එක සඳහා
+    }
 }
