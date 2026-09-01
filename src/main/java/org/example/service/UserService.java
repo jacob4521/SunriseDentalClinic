@@ -71,6 +71,11 @@ public class UserService {
     }
 
     public boolean deleteUser(String targetUsername, User requestingUser) {
-        return false; // TDD Red phase එක සඳහා
+        if (requestingUser == null) return false;
+        // Only Admins may delete users
+        if ("Admin".equals(requestingUser.getRole())) {
+            return userRepository.deleteUser(targetUsername);
+        }
+        return false;
     }
 }
