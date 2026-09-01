@@ -61,4 +61,25 @@ public class UserRepositoryTest {
         assertEquals("updatedPassword", updatedUser.getPassword());
         assertEquals("Admin", updatedUser.getRole());
     }
+
+    @Test
+    void deleteUser_deletesUserSuccessfully() {
+        UserRepository repo = new UserRepository();
+        String uniqueUsername = "diana_" + System.currentTimeMillis();
+        User user = new User(1, uniqueUsername, "tempPassword", "Staff");
+
+        // Save user first
+        repo.saveUser(user);
+
+        // Call deleteUser - should return true on successful delete
+        // TDD: This test should fail (red) until deleteUser is properly implemented
+        assertTrue(repo.deleteUser(uniqueUsername));
+
+        // Verify the user is actually deleted by checking findByUsername returns null
+        User deletedUser = repo.findByUsername(uniqueUsername);
+
+        // After deletion, findByUsername should return null
+        // This verifies the user was actually removed from the database
+        assertEquals(null, deletedUser);
+    }
 }

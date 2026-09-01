@@ -105,4 +105,8 @@ public class UserRepository {
             return false;
         }
     }
+
+    public boolean deleteUser(String username) {
+        return false;
+    }
 }
