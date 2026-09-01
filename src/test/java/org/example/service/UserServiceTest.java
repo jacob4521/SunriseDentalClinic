@@ -166,4 +166,21 @@ public class UserServiceTest {
         // Assert: should be true when requester is Admin
         assertTrue(result);
     }
+
+    @Test
+    void updateUser_returnsFalseWhenRequestedByStaff() {
+        // Arrange: staff requesting user
+        User staff = new User(2, "staffUser", "hashed", "Staff");
+
+        // Updated user data
+        User updatedUser = new User(4, "otherUser", "newPass", "Staff");
+
+        // Act
+        boolean result = userService.updateUser(updatedUser, staff);
+
+        // Assert: should be false and repository.updateUser shouldn't be called
+        assertFalse(result);
+        verify(userRepository, never()).updateUser(any(User.class));
+    }
+
 }
