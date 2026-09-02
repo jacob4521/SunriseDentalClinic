@@ -59,4 +59,26 @@ public class UserServletTest {
         // Assert: Expect created (201)
         verify(resp).setStatus(HttpServletResponse.SC_CREATED);
     }
+
+    @Test
+    void doPost_returnsConflictWhenRegistrationFails() throws Exception {
+        // Arrange
+        when(req.getPathInfo()).thenReturn("/register");
+
+        String json = "{\"username\":\"testUser\",\"password\":\"password123\",\"role\":\"Staff\"}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+
+        when(userService.registerUser(any())).thenReturn(false);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        when(resp.getWriter()).thenReturn(pw);
+
+        // Act
+        userServlet.doPost(req, resp);
+
+        // Assert: Expect conflict (409)
+        verify(resp).setStatus(HttpServletResponse.SC_CONFLICT);
+    }
 }
