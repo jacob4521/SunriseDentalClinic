@@ -148,4 +148,23 @@ public class UserServletTest {
         // Assert: Expect OK (200)
         verify(resp).setStatus(HttpServletResponse.SC_OK);
     }
+
+    @Test
+    void doPut_returnsForbiddenWhenUpdateFails() throws Exception {
+        // Arrange
+        String json = "{\"requestingUser\":{\"role\":\"Staff\"},\"updatedUser\":{\"password\":\"newPassword123\"}}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+        when(userService.updateUser(any(User.class), any(User.class))).thenReturn(false);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
+
+        // Act
+        userServlet.doPut(req, resp);
+
+        // Assert: Expect Forbidden (403)
+        verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
 }
