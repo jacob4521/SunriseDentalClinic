@@ -106,4 +106,26 @@ public class UserServletTest {
         // Assert: Expect OK (200)
         verify(resp).setStatus(HttpServletResponse.SC_OK);
     }
+
+    @Test
+    void doPost_returnsUnauthorizedWhenLoginFails() throws Exception {
+        // Arrange
+        when(req.getPathInfo()).thenReturn("/login");
+
+        String json = "{\"username\":\"badUser\",\"password\":\"wrongPass\"}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+
+        when(userService.authenticateUser(anyString(), anyString())).thenReturn(null);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        when(resp.getWriter()).thenReturn(pw);
+
+        // Act
+        userServlet.doPost(req, resp);
+
+        // Assert: Expect Unauthorized (401)
+        verify(resp).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
 }
