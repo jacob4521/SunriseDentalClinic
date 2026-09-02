@@ -20,8 +20,8 @@ public class UserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String path = req.getPathInfo();
+        Gson gson = new Gson();
         if ("/register".equals(path)) {
-            Gson gson = new Gson();
             User user = gson.fromJson(req.getReader(), User.class);
             boolean registered = userService.registerUser(user);
             if (registered) {
@@ -30,6 +30,16 @@ public class UserServlet extends HttpServlet {
             } else {
                 resp.setStatus(HttpServletResponse.SC_CONFLICT);
                 resp.getWriter().write("{\"error\": \"User could not be registered\"}");
+            }
+        } else if ("/login".equals(path)) {
+            User credentials = gson.fromJson(req.getReader(), User.class);
+            User authenticated = userService.authenticateUser(credentials.getUsername(), credentials.getPassword());
+            if (authenticated != null) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().write(gson.toJson(authenticated));
+            } else {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.getWriter().write("{\"error\": \"Invalid credentials\"}");
             }
         } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
