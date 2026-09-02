@@ -14,8 +14,10 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import org.example.User;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -80,5 +82,28 @@ public class UserServletTest {
 
         // Assert: Expect conflict (409)
         verify(resp).setStatus(HttpServletResponse.SC_CONFLICT);
+    }
+
+    @Test
+    void doPost_authenticatesUserSuccessfully() throws Exception {
+        // Arrange
+        when(req.getPathInfo()).thenReturn("/login");
+
+        String json = "{\"username\":\"testUser\",\"password\":\"password123\"}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+
+        User authenticated = new User(1, "testUser", "hashed", "Staff");
+        when(userService.authenticateUser(anyString(), anyString())).thenReturn(authenticated);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        when(resp.getWriter()).thenReturn(pw);
+
+        // Act
+        userServlet.doPost(req, resp);
+
+        // Assert: Expect OK (200)
+        verify(resp).setStatus(HttpServletResponse.SC_OK);
     }
 }
