@@ -68,4 +68,9 @@ public class UserServlet extends HttpServlet {
             resp.getWriter().write("{\"error\": \"User could not be updated\"}");
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
 }

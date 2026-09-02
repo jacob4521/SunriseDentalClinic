@@ -18,6 +18,7 @@ import org.example.User;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -166,5 +167,24 @@ public class UserServletTest {
 
         // Assert: Expect Forbidden (403)
         verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    @Test
+    void doDelete_deletesUserSuccessfully() throws Exception {
+        // Arrange
+        String json = "{\"requestingUser\":{\"role\":\"Admin\"},\"targetUsername\":\"userToDelete\"}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+        when(userService.deleteUser(eq("userToDelete"), any(User.class))).thenReturn(true);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
+
+        // Act
+        userServlet.doDelete(req, resp);
+
+        // Assert: Expect OK (200)
+        verify(resp).setStatus(HttpServletResponse.SC_OK);
     }
 }
