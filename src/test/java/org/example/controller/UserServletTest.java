@@ -128,4 +128,19 @@ public class UserServletTest {
         // Assert: Expect Unauthorized (401)
         verify(resp).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
+
+    @Test
+    void doPut_updatesUserSuccessfully() throws Exception {
+        // Arrange
+        String json = "{\"requestingUser\":{\"role\":\"Admin\"},\"updatedUser\":{\"password\":\"newPassword123\"}}";
+        BufferedReader reader = new BufferedReader(new StringReader(json));
+        when(req.getReader()).thenReturn(reader);
+        when(userService.updateUser(any(User.class), any(User.class))).thenReturn(true);
+
+        // Act
+        userServlet.doPut(req, resp);
+
+        // Assert: Expect OK (200)
+        verify(resp).setStatus(HttpServletResponse.SC_OK);
+    }
 }
