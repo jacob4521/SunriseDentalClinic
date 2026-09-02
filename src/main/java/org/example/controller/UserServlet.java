@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.service.UserService;
 import org.example.User;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
@@ -48,6 +50,22 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        resp.setContentType("application/json");
+        Gson gson = new Gson();
+        
+        JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
+        
+        User requestingUser = gson.fromJson(jsonObject.get("requestingUser"), User.class);
+        User updatedUser = gson.fromJson(jsonObject.get("updatedUser"), User.class);
+        
+        boolean updated = userService.updateUser(updatedUser, requestingUser);
+        
+        if (updated) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write("{\"message\": \"User updated successfully\"}");
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"User could not be updated\"}");
+        }
     }
 }

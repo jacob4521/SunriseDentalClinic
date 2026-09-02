@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
 public class UserServletTest {
 
@@ -136,6 +137,10 @@ public class UserServletTest {
         BufferedReader reader = new BufferedReader(new StringReader(json));
         when(req.getReader()).thenReturn(reader);
         when(userService.updateUser(any(User.class), any(User.class))).thenReturn(true);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
 
         // Act
         userServlet.doPut(req, resp);
