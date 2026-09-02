@@ -71,6 +71,22 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        resp.setContentType("application/json");
+        Gson gson = new Gson();
+
+        JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
+
+        User requestingUser = gson.fromJson(jsonObject.get("requestingUser"), User.class);
+        String targetUsername = jsonObject.get("targetUsername").getAsString();
+
+        boolean deleted = userService.deleteUser(targetUsername, requestingUser);
+
+        if (deleted) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write("{\"message\": \"User deleted successfully\"}");
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"User could not be deleted\"}");
+        }
     }
 }
