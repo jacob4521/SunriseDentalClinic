@@ -134,7 +134,10 @@ public class UserServletTest {
     @Test
     void doPut_updatesUserSuccessfully() throws Exception {
         // Arrange
-        String json = "{\"requestingUser\":{\"role\":\"Admin\"},\"updatedUser\":{\"password\":\"newPassword123\"}}";
+        // Simulate JWT filter setting userRole attribute
+        when(req.getAttribute("userRole")).thenReturn("Admin");
+
+        String json = "{\"username\":\"testUser\",\"password\":\"newPassword123\",\"role\":\"Admin\"}";
         BufferedReader reader = new BufferedReader(new StringReader(json));
         when(req.getReader()).thenReturn(reader);
         when(userService.updateUser(any(User.class), any(User.class))).thenReturn(true);
@@ -151,12 +154,10 @@ public class UserServletTest {
     }
 
     @Test
-    void doPut_returnsForbiddenWhenUpdateFails() throws Exception {
+    void doPut_returnsForbiddenWhenUserRoleIsNull() throws Exception {
         // Arrange
-        String json = "{\"requestingUser\":{\"role\":\"Staff\"},\"updatedUser\":{\"password\":\"newPassword123\"}}";
-        BufferedReader reader = new BufferedReader(new StringReader(json));
-        when(req.getReader()).thenReturn(reader);
-        when(userService.updateUser(any(User.class), any(User.class))).thenReturn(false);
+        // Simulate missing JWT token (filter would not set userRole)
+        when(req.getAttribute("userRole")).thenReturn(null);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -165,14 +166,34 @@ public class UserServletTest {
         // Act
         userServlet.doPut(req, resp);
 
-        // Assert: Expect Forbidden (403)
+        // Assert: Expect Forbidden (403) due to missing authorization
+        verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    @Test
+    void doPut_returnsForbiddenWhenUserRoleIsNotAdmin() throws Exception {
+        // Arrange
+        // Simulate JWT filter setting non-admin role
+        when(req.getAttribute("userRole")).thenReturn("Staff");
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
+
+        // Act
+        userServlet.doPut(req, resp);
+
+        // Assert: Expect Forbidden (403) due to insufficient role
         verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     @Test
     void doDelete_deletesUserSuccessfully() throws Exception {
         // Arrange
-        String json = "{\"requestingUser\":{\"role\":\"Admin\"},\"targetUsername\":\"userToDelete\"}";
+        // Simulate JWT filter setting userRole attribute
+        when(req.getAttribute("userRole")).thenReturn("Admin");
+
+        String json = "{\"targetUsername\":\"userToDelete\"}";
         BufferedReader reader = new BufferedReader(new StringReader(json));
         when(req.getReader()).thenReturn(reader);
         when(userService.deleteUser(eq("userToDelete"), any(User.class))).thenReturn(true);
@@ -189,12 +210,10 @@ public class UserServletTest {
     }
 
     @Test
-    void doDelete_returnsForbiddenWhenDeletionFails() throws Exception {
+    void doDelete_returnsForbiddenWhenUserRoleIsNull() throws Exception {
         // Arrange
-        String json = "{\"requestingUser\":{\"role\":\"Staff\"},\"targetUsername\":\"userToDelete\"}";
-        BufferedReader reader = new BufferedReader(new StringReader(json));
-        when(req.getReader()).thenReturn(reader);
-        when(userService.deleteUser(anyString(), any(User.class))).thenReturn(false);
+        // Simulate missing JWT token (filter would not set userRole)
+        when(req.getAttribute("userRole")).thenReturn(null);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -203,7 +222,24 @@ public class UserServletTest {
         // Act
         userServlet.doDelete(req, resp);
 
-        // Assert: Expect Forbidden (403)
+        // Assert: Expect Forbidden (403) due to missing authorization
+        verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    @Test
+    void doDelete_returnsForbiddenWhenUserRoleIsNotAdmin() throws Exception {
+        // Arrange
+        // Simulate JWT filter setting non-admin role
+        when(req.getAttribute("userRole")).thenReturn("Staff");
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
+
+        // Act
+        userServlet.doDelete(req, resp);
+
+        // Assert: Expect Forbidden (403) due to insufficient role
         verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 }

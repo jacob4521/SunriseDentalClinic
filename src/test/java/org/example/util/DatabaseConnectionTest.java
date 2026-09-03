@@ -1,6 +1,8 @@
-package util;
+package org.example.util;
 
 import org.junit.jupiter.api.Test;
+import util.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
