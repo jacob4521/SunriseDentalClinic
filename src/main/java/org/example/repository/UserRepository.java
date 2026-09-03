@@ -12,6 +12,16 @@ public class UserRepository {
     private String dbUser;
     private String dbPass;
 
+    static {
+        try {
+            // Tomcat සඳහා MySQL Driver එක Explicitly Load කිරීම
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("MySQL Driver not found in classpath!", e);
+        }
+    }
+
     // Default constructor for production (MySQL)
     public UserRepository() {
         this.url = "jdbc:mysql://localhost:3306/sunrise_dental";

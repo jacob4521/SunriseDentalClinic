@@ -13,6 +13,10 @@ public class User {
         this.setRole(role);
     }
 
+    // Default constructor (Gson වැනි Libraries සඳහා අනිවාර්ය වේ)
+    public User() {
+    }
+
     public int getUserId() {
         return userId;
     }
