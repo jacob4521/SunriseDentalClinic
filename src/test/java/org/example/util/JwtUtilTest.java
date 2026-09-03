@@ -16,7 +16,7 @@ public class JwtUtilTest {
 
         // Act
         String token = org.example.util.JwtUtil.generateToken(username, role);
-        System.out.println("MY TOKEN: " + token);
+        System.out.println(token);
 
         // Assert - Token is generated and not empty
         assertNotNull(token, "Token should not be null");
