@@ -1,4 +1,5 @@
 package org.example.controller;
+import jakarta.servlet.annotation.WebServlet;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,8 +12,15 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
+
+@WebServlet("/auth/*")
 public class UserServlet extends HttpServlet {
     private final UserService userService;
+
+    public UserServlet() {
+
+        this.userService = new UserService(new org.example.repository.UserRepository());
+    }
 
     public UserServlet(UserService userService) {
         this.userService = userService;
