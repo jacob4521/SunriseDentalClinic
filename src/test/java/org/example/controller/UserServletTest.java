@@ -135,7 +135,7 @@ public class UserServletTest {
     void doPut_updatesUserSuccessfully() throws Exception {
         // Arrange
         // Simulate JWT filter setting userRole attribute
-        when(req.getAttribute("userRole")).thenReturn("Admin");
+        when(req.getAttribute("role")).thenReturn("Admin");
 
         String json = "{\"username\":\"testUser\",\"password\":\"newPassword123\",\"role\":\"Admin\"}";
         BufferedReader reader = new BufferedReader(new StringReader(json));
@@ -157,7 +157,7 @@ public class UserServletTest {
     void doPut_returnsForbiddenWhenUserRoleIsNull() throws Exception {
         // Arrange
         // Simulate missing JWT token (filter would not set userRole)
-        when(req.getAttribute("userRole")).thenReturn(null);
+        when(req.getAttribute("role")).thenReturn(null);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -174,7 +174,7 @@ public class UserServletTest {
     void doPut_returnsForbiddenWhenUserRoleIsNotAdmin() throws Exception {
         // Arrange
         // Simulate JWT filter setting non-admin role
-        when(req.getAttribute("userRole")).thenReturn("Staff");
+        when(req.getAttribute("role")).thenReturn("Staff");
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -191,7 +191,7 @@ public class UserServletTest {
     void doDelete_deletesUserSuccessfully() throws Exception {
         // Arrange
         // Simulate JWT filter setting userRole attribute
-        when(req.getAttribute("userRole")).thenReturn("Admin");
+        when(req.getAttribute("role")).thenReturn("Admin");
 
         String json = "{\"targetUsername\":\"userToDelete\"}";
         BufferedReader reader = new BufferedReader(new StringReader(json));
@@ -213,7 +213,7 @@ public class UserServletTest {
     void doDelete_returnsForbiddenWhenUserRoleIsNull() throws Exception {
         // Arrange
         // Simulate missing JWT token (filter would not set userRole)
-        when(req.getAttribute("userRole")).thenReturn(null);
+        when(req.getAttribute("role")).thenReturn(null);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -230,7 +230,7 @@ public class UserServletTest {
     void doDelete_returnsForbiddenWhenUserRoleIsNotAdmin() throws Exception {
         // Arrange
         // Simulate JWT filter setting non-admin role
-        when(req.getAttribute("userRole")).thenReturn("Staff");
+        when(req.getAttribute("role")).thenReturn("Staff");
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);

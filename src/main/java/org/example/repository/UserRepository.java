@@ -27,6 +27,14 @@ public class UserRepository {
         this.url = "jdbc:mysql://localhost:3306/sunrise_dental";
         this.dbUser = "root";
         this.dbPass = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "";
+
+        // Tomcat Server එකට MySQL Driver එක අනිවාර්යයෙන්ම Load කිරීම
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL JDBC Driver not found in Tomcat!");
+            e.printStackTrace();
+        }
     }
 
     // Parameterized constructor for testing (H2)
