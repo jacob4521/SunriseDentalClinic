@@ -7,8 +7,11 @@ import java.util.Date;
 
 public class JwtUtil {
 
+    // Static secret string for consistent key generation across JVM restarts
+    private static final String SECRET_STRING = "MySuperSecretKeyForSunriseDentalClinicApp12345";
+
     // Token එක Sign කරන්න භාවිතා කරන ඉතාමත් ආරක්ෂිත රහස් යතුර (Secret Key)
-    private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes());
 
     // Token එකක වලංගු කාලය (පැය 1ක් ලෙස සකසා ඇත: 1000ms * 60s * 60m)
     private static final long EXPIRATION_TIME = 1000 * 60 * 60;

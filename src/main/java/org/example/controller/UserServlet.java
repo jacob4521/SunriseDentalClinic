@@ -68,9 +68,7 @@ public class UserServlet extends HttpServlet {
 
         Gson gson = new Gson();
 
-        JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
-
-        User updatedUser = gson.fromJson(jsonObject.get("updatedUser"), User.class);
+        User updatedUser = gson.fromJson(req.getReader(), User.class);
 
         User requestingUser = new User();
         requestingUser.setRole("Admin");
