@@ -1,5 +1,4 @@
 package org.example.controller;
-import jakarta.servlet.annotation.WebServlet;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,20 +12,16 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
-
 @WebServlet("/auth/*")
 public class UserServlet extends HttpServlet {
+    private final UserService userService;
+
+    // Default constructor
     public UserServlet() {
         this(new UserService(new org.example.repository.UserRepository()));
     }
 
-    private final UserService userService;
-
-    public UserServlet() {
-
-        this.userService = new UserService(new org.example.repository.UserRepository());
-    }
-
+    // Parameterized constructor
     public UserServlet(UserService userService) {
         this.userService = userService;
     }
@@ -36,6 +31,7 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         String path = req.getPathInfo();
         Gson gson = new Gson();
+
         if ("/register".equals(path)) {
             User user = gson.fromJson(req.getReader(), User.class);
             boolean registered = userService.registerUser(user);
@@ -65,16 +61,16 @@ public class UserServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
 
-        String userRole = (String) req.getAttribute("userRole");
+        // Fixed: role and equalsIgnoreCase
+        String role = (String) req.getAttribute("role");
 
-        if (userRole == null || !userRole.equals("Admin")) {
+        if (role == null || !role.equalsIgnoreCase("Admin")) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
             return;
         }
 
         Gson gson = new Gson();
-
         User updatedUser = gson.fromJson(req.getReader(), User.class);
 
         User requestingUser = new User();
@@ -95,18 +91,17 @@ public class UserServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
 
-        String userRole = (String) req.getAttribute("userRole");
+        // Fixed: role and equalsIgnoreCase
+        String role = (String) req.getAttribute("role");
 
-        if (userRole == null || !userRole.equals("Admin")) {
+        if (role == null || !role.equalsIgnoreCase("Admin")) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
             return;
         }
 
         Gson gson = new Gson();
-
         JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
-
         String targetUsername = jsonObject.get("targetUsername").getAsString();
 
         User requestingUser = new User();
