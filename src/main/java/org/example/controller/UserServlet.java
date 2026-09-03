@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +12,12 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
+@WebServlet("/users/*")
 public class UserServlet extends HttpServlet {
+    public UserServlet() {
+        this(new UserService(new org.example.repository.UserRepository()));
+    }
+
     private final UserService userService;
 
     public UserServlet(UserService userService) {
@@ -51,15 +57,26 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
+
+        String userRole = (String) req.getAttribute("userRole");
+
+        if (userRole == null || !userRole.equals("Admin")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
+            return;
+        }
+
         Gson gson = new Gson();
-        
+
         JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
-        
-        User requestingUser = gson.fromJson(jsonObject.get("requestingUser"), User.class);
+
         User updatedUser = gson.fromJson(jsonObject.get("updatedUser"), User.class);
-        
+
+        User requestingUser = new User();
+        requestingUser.setRole("Admin");
+
         boolean updated = userService.updateUser(updatedUser, requestingUser);
-        
+
         if (updated) {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("{\"message\": \"User updated successfully\"}");
@@ -72,12 +89,23 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
+
+        String userRole = (String) req.getAttribute("userRole");
+
+        if (userRole == null || !userRole.equals("Admin")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
+            return;
+        }
+
         Gson gson = new Gson();
 
         JsonObject jsonObject = JsonParser.parseReader(req.getReader()).getAsJsonObject();
 
-        User requestingUser = gson.fromJson(jsonObject.get("requestingUser"), User.class);
         String targetUsername = jsonObject.get("targetUsername").getAsString();
+
+        User requestingUser = new User();
+        requestingUser.setRole("Admin");
 
         boolean deleted = userService.deleteUser(targetUsername, requestingUser);
 
