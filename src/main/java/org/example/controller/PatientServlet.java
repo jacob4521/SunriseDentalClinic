@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import com.google.gson.Gson;
+import jakarta.servlet.annotation.WebServlet;
 import org.example.model.Patient;
 import org.example.service.PatientService;
 import org.example.repository.PatientRepository;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+@WebServlet("/patients/*")
 public class PatientServlet extends HttpServlet {
 
     private final PatientService patientService;
@@ -29,7 +31,7 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String role = (String) req.getAttribute("userRole");
+        String role = (String) req.getAttribute("role");
         if (role == null) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -45,7 +47,7 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String role = (String) req.getAttribute("userRole");
+        String role = (String) req.getAttribute("role");
         if (role == null) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -76,7 +78,7 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String role = (String) req.getAttribute("userRole");
+        String role = (String) req.getAttribute("role");
         if (role == null) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -92,7 +94,7 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String role = (String) req.getAttribute("userRole");
+        String role = (String) req.getAttribute("role");
         // Only Admin can delete
         if (role == null || !role.equals("Admin")) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
