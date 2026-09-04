@@ -50,6 +50,8 @@ public class JwtAuthFilter implements Filter {
             chain.doFilter(request, response);
 
         } catch (Exception e) {
+            e.printStackTrace();
+
             httpResponse.setContentType("application/json");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.getWriter().write("{\"error\": \"Invalid or expired token\"}");
