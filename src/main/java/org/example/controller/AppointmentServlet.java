@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/appointments")
 public class AppointmentServlet extends HttpServlet {
