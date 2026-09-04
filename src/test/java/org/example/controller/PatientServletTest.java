@@ -41,7 +41,7 @@ public class PatientServletTest {
 
     @Test
     void doPost_createsPatientSuccessfully() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Admin");
+        when(req.getAttribute("role")).thenReturn("Admin");
 
         String json = "{\"patientName\":\"John Doe\",\"address\":\"Galle\",\"contactNumber\":\"0712345678\"}";
         when(req.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
@@ -53,7 +53,7 @@ public class PatientServletTest {
 
     @Test
     void doPost_returnsForbiddenWhenRoleIsNull() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn(null);
+        when(req.getAttribute("role")).thenReturn(null);
 
         patientServlet.doPost(req, resp);
         verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -61,7 +61,7 @@ public class PatientServletTest {
 
     @Test
     void doGet_returnsAllPatients() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Staff");
+        when(req.getAttribute("role")).thenReturn("Staff");
         when(req.getPathInfo()).thenReturn(null);
 
         when(patientService.getAllPatients()).thenReturn(Arrays.asList(new Patient(), new Patient()));
@@ -75,7 +75,7 @@ public class PatientServletTest {
 
     @Test
     void doGet_returnsPatientById() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Staff");
+        when(req.getAttribute("role")).thenReturn("Staff");
         when(req.getPathInfo()).thenReturn("/1");
 
         when(patientService.getPatientById(1)).thenReturn(new Patient(1, "John", "Galle", "071"));
@@ -89,7 +89,7 @@ public class PatientServletTest {
 
     @Test
     void doPut_updatesPatientSuccessfully() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Admin");
+        when(req.getAttribute("role")).thenReturn("Admin");
 
         String json = "{\"patientId\":1,\"patientName\":\"John Doe\",\"address\":\"Galle\",\"contactNumber\":\"0712345678\"}";
         when(req.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
@@ -101,7 +101,7 @@ public class PatientServletTest {
 
     @Test
     void doDelete_deletesPatientSuccessfully() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Admin");
+        when(req.getAttribute("role")).thenReturn("Admin");
         when(req.getPathInfo()).thenReturn("/1");
         when(patientService.deletePatient(1)).thenReturn(true);
 
@@ -111,7 +111,7 @@ public class PatientServletTest {
 
     @Test
     void doDelete_returnsForbiddenWhenRoleIsStaff() throws Exception {
-        when(req.getAttribute("userRole")).thenReturn("Staff");
+        when(req.getAttribute("role")).thenReturn("Staff");
 
         patientServlet.doDelete(req, resp);
         verify(resp).setStatus(HttpServletResponse.SC_FORBIDDEN);

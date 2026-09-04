@@ -12,7 +12,7 @@ public class DatabaseConnection {
     private static final String USER = ENV.getOrDefault("DB_USER", "root");
     private static final String PASSWORD = ENV.get("DB_PASSWORD");
 
-    public static Connection getConnection() throws SQLException {
+public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
