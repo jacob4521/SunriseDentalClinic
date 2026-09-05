@@ -46,7 +46,7 @@ public class AuthServlet extends HttpServlet {
 
             // Return token in JSON response with 200 OK status
             resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write("{\"token\": \"" + token + "\"}");
+            resp.getWriter().write("{\"token\": \"" + token + "\", \"role\": \"" + role + "\"}");
         } else {
             // Authentication failed - return 401 Unauthorized
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
