@@ -54,4 +54,16 @@ public class TreatmentRepository {
         }
         return treatments;
     }
+
+    public boolean deleteTreatment(int id) {
+        String sql = "DELETE FROM treatments WHERE treatment_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

@@ -22,4 +22,8 @@ public class DentistService {
     public List<Dentist> getAllDentists() {
         return dentistRepository.getAllDentists();
     }
+
+    public boolean deleteDentist(int id) {
+        return dentistRepository.deleteDentist(id);
+    }
 }

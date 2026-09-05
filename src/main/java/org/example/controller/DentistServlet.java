@@ -63,4 +63,43 @@ public class DentistServlet extends HttpServlet {
             resp.getWriter().write("{\"error\": \"Failed to add dentist\"}");
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+
+        String role = (String) req.getAttribute("role");
+        if (role == null || !role.equalsIgnoreCase("Admin")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
+            return;
+        }
+
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\": \"Dentist ID is required\"}");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            boolean deleted = dentistService.deleteDentist(id);
+
+            if (deleted) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().write("{\"message\": \"Dentist deleted successfully\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\": \"Failed to delete dentist.\"}");
+            }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\": \"Invalid ID format\"}");
+        } catch (Exception e) {
+            // Foreign Key Constraint Error එක මෙතැනදී අල්ලා ගනී
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\": \"Cannot delete this dentist because they have scheduled appointments!\"}");
+        }
+    }
 }

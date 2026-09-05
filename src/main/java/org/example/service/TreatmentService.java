@@ -30,4 +30,8 @@ public class TreatmentService {
         // Retrieve data from repository
         return treatmentRepository.getAllTreatments();
     }
+
+    public boolean deleteTreatment(int id) {
+        return treatmentRepository.deleteTreatment(id);
+    }
 }

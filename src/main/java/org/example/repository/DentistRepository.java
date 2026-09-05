@@ -46,4 +46,16 @@ public class DentistRepository {
         }
         return dentists;
     }
+
+    public boolean deleteDentist(int id) {
+        String query = "DELETE FROM dentists WHERE dentist_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

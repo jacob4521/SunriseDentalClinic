@@ -82,4 +82,42 @@ public class TreatmentController extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+
+        // RBAC Security Check: Only Admins can delete
+        String role = (String) req.getAttribute("role");
+        if (role == null || !role.equals("Admin")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
+            return;
+        }
+
+        // Query parameter එකෙන් ID එක ලබා ගැනීම (උදා: /treatments?id=5)
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\": \"Treatment ID is required\"}");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(idParam);
+            // Service එකේ deleteTreatment(id) method එක තිබිය යුතුය
+            boolean isDeleted = treatmentService.deleteTreatment(id);
+
+            if (isDeleted) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().write("{\"message\": \"Treatment deleted successfully\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\": \"Failed to delete treatment.\"}");
+            }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\": \"Invalid ID format\"}");
+        }
+    }
 }
