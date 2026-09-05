@@ -58,6 +58,32 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        String role = (String) req.getAttribute("role");
+
+        if (role == null || !role.equalsIgnoreCase("Admin")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("{\"error\": \"Access denied. Admin role required\"}");
+            return;
+        }
+
+        User requestingUser = new User();
+        requestingUser.setRole("Admin");
+
+        java.util.List<User> users = userService.getAllUsers(requestingUser);
+
+        if (users != null) {
+            Gson gson = new Gson();
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write(gson.toJson(users));
+        } else {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"error\": \"Could not retrieve users\"}");
+        }
+    }
+
+    @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
 

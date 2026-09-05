@@ -24,7 +24,7 @@ public class JwtAuthFilter implements Filter {
 
         String path = httpRequest.getRequestURI();
 
-        if (path.contains("/auth/")) {
+        if (path.endsWith("/auth/login")) {
             chain.doFilter(request, response);
             return;
         }
@@ -47,7 +47,6 @@ public class JwtAuthFilter implements Filter {
 
             httpRequest.setAttribute("role", role);
 
-            chain.doFilter(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +54,10 @@ public class JwtAuthFilter implements Filter {
             httpResponse.setContentType("application/json");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+            return;
         }
+
+        chain.doFilter(request, response);
     }
 
     @Override

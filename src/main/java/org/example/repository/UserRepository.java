@@ -142,4 +142,25 @@ public class UserRepository {
             return false;
         }
     }
+
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT user_id, username, role FROM users";
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUsername(rs.getString("username"));
+                u.setRole(rs.getString("role"));
+                users.add(u);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
 }

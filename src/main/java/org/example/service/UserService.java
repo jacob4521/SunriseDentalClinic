@@ -100,4 +100,11 @@ public class UserService {
         return userRepository.updateUser(updatedUser);
     }
 
+    public java.util.List<User> getAllUsers(User requestingUser) {
+        if (requestingUser == null || !"Admin".equals(requestingUser.getRole())) {
+            return null;
+        }
+        return userRepository.getAllUsers();
+    }
+
 }

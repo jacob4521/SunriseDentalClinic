@@ -46,10 +46,12 @@ public class User {
     }
 
     public void setRole(String role) {
-        if (role == null || role.isEmpty() || (!"Admin".equals(role) && !"Staff".equals(role))) {
+        // equalsIgnoreCase මඟින් simple 'admin' ආවත් error එකක් නොදී භාර ගනී
+        if (role == null || role.isEmpty() || (!role.equalsIgnoreCase("Admin") && !role.equalsIgnoreCase("Staff"))) {
             throw new IllegalArgumentException("Role must be exactly Admin or Staff.");
         }
 
-        this.role = role;
+        // Database එකේ කොහොම තිබුණත්, Java ඇතුළේදී එය නිවැරදිව "Admin" හෝ "Staff" ලෙස සකසයි
+        this.role = role.equalsIgnoreCase("Admin") ? "Admin" : "Staff";
     }
 }
